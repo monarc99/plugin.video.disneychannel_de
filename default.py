@@ -55,10 +55,18 @@ def listVideos(url):
         xbmc.executebuiltin('Container.SetViewMode('+viewMode+')')
 
 
+def getRedirectedUrl(url):
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0')
+    response = urllib2.urlopen(req)
+    response.close()
+    return str(response.geturl())
+
+
 def playVideo(url):
     content = opener.open(url).read()
-    match = re.compile('"url":"(.+?)"', re.DOTALL).findall(content)
-    finalURL = match[0].replace("https","http")
+    match = re.compile('"dataUrl":"(.+?)"', re.DOTALL).findall(content)
+    finalURL = getRedirectedUrl(match[0])
     listitem = xbmcgui.ListItem(path=finalURL)
     xbmcplugin.setResolvedUrl(pluginhandle, True, listitem)
 
